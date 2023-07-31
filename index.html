@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Economic History of China</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.5.1"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@1.0.2"></script>
+
+    <style>
+        h1 {
+            text-align: center;
+        }
+
+        #buttons-container {
+            text-align: center;
+        }
+
+        .chart-container {
+          width: 1300px;
+          height: 700px;
+          overflow: auto;
+          direction: ltr;
+        }
+    
+        canvas {
+          width: 300px;
+          height: 100px;
+          direction: rtl;
+        }
+    </style>
+</head>
+<body>
+    <h1>Economic History of China (1961~2022)</h1>
+    <div id="buttons-container">
+        <button id="btn-revolution">Cultural Revolution</button>
+        <button id="btn-reform">Chinese Economic Reform</button>
+        <button id="btn-wto">China join WTO</button>
+        <button id="btn-covid">COVID19</button>
+    </div>
+    <p id="event-description"></p>
+    <label for="start-year">Start Year: </label>
+    <input type="range" id="start-year" name="start-year" min="1961" max="2022">
+    <span id="start-year-display">1961</span>
+    
+    <label for="end-year">End Year: </label>
+    <input type="range" id="end-year" name="end-year" min="1961" max="2022">
+    <span id="end-year-display">2022</span>
+    <div class="chart-container">
+        <canvas id="chart-gdp"></canvas>
+    </div>
+    <div class="chart-container">
+        <canvas id="chart-gdp-per-capita"></canvas>
+    </div>
+    <div class="chart-container">
+        <canvas id="chart-gdp-change"></canvas>
+    </div>
+    <label for="start-year">Start Year: </label>
+    <input type="range" id="start-year" name="start-year" min="1961" max="2022">
+    <span id="start-year-display">1961</span>
+    
+    <label for="end-year">End Year: </label>
+    <input type="range" id="end-year" name="end-year" min="1961" max="2022">
+    <span id="end-year-display">2022</span>
+
+<script>
+
+const years = [1961, 1962, 1963, 1964, 1965, 1966, 1967, 1968, 1969, 1970, 1971, 1972, 1973, 1974, 1975, 1976, 1977, 1978, 1979, 1980, 1981, 1982, 1983, 1984, 1985, 1986, 1987, 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022];  
+const gdp = [59.71646763, 50.05686896, 47.20935901, 50.7067999, 59.70834349, 70.43626615, 76.72028597, 72.88163133, 70.84653506, 79.70590625, 92.60297343, 99.80095865, 113.6875863, 138.5442847, 144.1821334, 163.4315518, 153.9404553, 174.9380988, 149.5407528, 178.2805944, 191.1492116, 195.8663824, 205.0896999, 230.6867472, 259.946511, 309.4880281, 300.7581001, 272.9729748, 312.3536312, 347.7680513, 360.8579126, 383.3733181, 426.9157127, 444.7312824, 564.32467, 734.5478982, 863.7467175, 961.603953, 1029.043098, 1093.997267, 1211.34687, 1339.395719, 1470.550015, 1660.287966, 1955.347005, 2285.965892, 2752.131773, 3550.342737, 4594.307033, 5101.703073, 6087.163875, 7551.500124, 8532.229987, 9570.406236, 10475.68292, 11061.55308, 11233.27654, 12310.40937, 13894.81755, 14279.9375, 14687.67389, 17734.06265];  
+const gdpPerCapita = [89.5205, 75.8058, 70.9094, 74.3136, 85.4986, 98.4868, 104.3246, 96.5895, 91.4727, 100.1299, 113.163, 118.6546, 131.8836, 157.0904, 160.1401, 178.3418, 165.4055, 185.4228, 156.3964, 183.9832, 194.8047, 197.0715, 203.3349, 225.4319, 250.714, 294.4588, 281.9281, 251.812, 283.5377, 310.8819, 317.8847, 333.1421, 366.4607, 377.3898, 473.4923, 609.6567, 709.4138, 781.7442, 828.5805, 873.2871, 959.3725, 1053.1082, 1148.5083, 1288.6433, 1508.6681, 1753.4178, 2099.2294, 2693.9701, 3468.3046, 3832.2364, 4550.4531, 5614.3521, 6300.6151, 7020.3385, 7636.1166, 8016.4314, 8094.3634, 8816.9869, 9905.342, 10143.8382, 10408.6698, 12556.3331];  
+const gdpAnnualChange = [null, -27.27, -5.58, 10.3, 18.18, 16.95, 10.65, -5.77, -4.1, 16.94, 19.3, 7.06, 3.81, 7.76, 2.31, 8.72, -1.57, 7.57, 11.326, 7.5913, 7.8341, 5.1128, 9.0171, 10.7702, 15.1915, 13.4307, 8.95, 11.6574, 11.2226, 4.2063, 3.9203, 9.2628, 14.2245, 13.8837, 13.0368, 10.954, 9.9226, 9.2368, 7.846, 7.6617, 8.4901, 8.3357, 9.1336, 10.038, 10.1136, 11.3946, 12.721, 14.2309, 9.6507, 9.3987, 10.6359, 9.5508, 7.8637, 7.7662, 7.4258, 7.0413, 6.8488, 6.9472, 6.7498, 5.9505, 2.2397, 8.1098]; 
+
+var chartGdp;
+var chartGdpPerCapita;
+var chartGdpChange;
+
+document.getElementById('start-year').addEventListener('input', function(e) {
+    document.getElementById('start-year-display').innerText = e.target.value;
+    updateCharts();
+});
+
+document.getElementById('end-year').addEventListener('input', function(e) {
+    document.getElementById('end-year-display').innerText = e.target.value;
+    updateCharts();
+});
+
+function is1966InSelectedYears(startYear, endYear) {
+    return startYear <= 1966 && 1966 <= endYear;
+}
+
+function updateCharts() {
+    var startYear = parseInt(document.getElementById('start-year-display').innerText);
+    var endYear = parseInt(document.getElementById('end-year-display').innerText);
+    
+    var filteredYears = years.filter(year => year >= startYear && year <= endYear);
+    var filteredGdp = gdp.slice(years.indexOf(startYear), years.indexOf(endYear) + 1);
+    var filteredGdpPerCapita = gdpPerCapita.slice(years.indexOf(startYear), years.indexOf(endYear) + 1);
+    var filteredGdpAnnualChange = gdpAnnualChange.slice(years.indexOf(startYear), years.indexOf(endYear) + 1);
+    var is1966Selected = is1966InSelectedYears(startYear, endYear);
+    
+    if (chartGdp) chartGdp.destroy();
+    if (chartGdpPerCapita) chartGdpPerCapita.destroy();
+    if (chartGdpChange) chartGdpChange.destroy();
+
+    const ctxGdp = document.getElementById('chart-gdp').getContext('2d');
+    chartGdp = new Chart(ctxGdp, {
+        type: 'line',
+        data: {
+            labels: filteredYears,
+            datasets: [{
+                label: 'GDP (Billion $)',
+                data: filteredGdp,
+                borderColor: 'rgba(255, 99, 132, 1)',
+                backgroundColor: 'rgba(255, 99, 132, 0.2)',
+            }]
+        },
+        options: {
+            responsive: true,
+                title: {
+                    display: true,
+                    text: 'GDP Data'
+                },
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true
+                        }
+                    }]
+                },
+                plugins: {
+                    annotation: {
+                        annotations: {
+                            '1-1': {
+                                type: 'line',
+                                xMin: filteredYears.indexOf(1966),  
+                                xMax: filteredYears.indexOf(1966),
+                                borderColor: 'rgb(0, 0, 0)',
+                                borderWidth: 2,
+                                label: {
+                                    content: 'Cultural Revolution',
+                                    position: 'end', 
+                                    enabled: true,
+                                    yAdjust: -20, 
+                                }
+                            },
+                            '1-2': {
+                                type: 'line',
+                                xMin: filteredYears.indexOf(1978),  
+                                xMax: filteredYears.indexOf(1978),
+                                borderColor: 'rgb(0, 0, 0)',
+                                borderWidth: 2,
+                                label: {
+                                    content: 'Chinese Economic Reform',
+                                    position: 'end', 
+                                    enabled: true,
+                                    yAdjust: -60, 
+                                }
+                            },
+                            '1-3': {
+                                type: 'line',
+                                xMin: filteredYears.indexOf(2001),  
+                                xMax: filteredYears.indexOf(2001),
+                                borderColor: 'rgb(0, 0, 0)',
+                                borderWidth: 2,
+                                label: {
+                                    content: 'China join WTO',
+                                    position: 'end', 
+                                    enabled: true,
+                                    yAdjust: -60, 
+                                }
+                            },
+                            '1-4': {
+                                type: 'line',
+                                xMin: filteredYears.indexOf(2020),  
+                                xMax: filteredYears.indexOf(2020),
+                                borderColor: 'rgb(0, 0, 0)',
+                                borderWidth: 2,
+                                label: {
+                                    content: 'COVID19',
+                                    position: 'end', 
+                                    enabled: true,
+                                    yAdjust: -20, 
+                                }
+                            }
+                        }
+                    }  
+                }
+            }
+    });
+
+    const ctxGdpPerCapita = document.getElementById('chart-gdp-per-capita').getContext('2d');
+    chartGdpPerCapita = new Chart(ctxGdpPerCapita, {
+        type: 'line',
+        data: {
+            labels: filteredYears,
+            datasets: [{
+                label: 'GDP per capita',
+                data: filteredGdpPerCapita,
+                borderColor: 'rgba(75, 192, 192, 1)',
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+            }]
+        },
+        options: {
+            responsive: true,
+            title: {
+                display: true,
+                text: 'GDP per Capita Data'
+            },
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero: true
+                    }
+                }]
+            },
+            plugins: {
+                annotation: {
+                    annotations: {
+                        '2-1': {
+                            type: 'line',
+                            xMin: filteredYears.indexOf(1966),  
+                            xMax: filteredYears.indexOf(1966),
+                            borderColor: 'rgb(0, 0, 0)',
+                            borderWidth: 2,
+                            label: {
+                                content: 'Cultural Revolution',
+                                position: 'end', 
+                                enabled: true,
+                                yAdjust: -20, 
+                            }
+                        },
+                        '2-2': {
+                                type: 'line',
+                                xMin: filteredYears.indexOf(1978),  
+                                xMax: filteredYears.indexOf(1978),
+                                borderColor: 'rgb(0, 0, 0)',
+                                borderWidth: 2,
+                                label: {
+                                    content: 'Chinese Economic Reform',
+                                    position: 'end', 
+                                    enabled: true,
+                                    yAdjust: -60, 
+                                }
+                            },
+                        '2-3': {
+                                type: 'line',
+                                xMin: filteredYears.indexOf(2001),  
+                                xMax: filteredYears.indexOf(2001),
+                                borderColor: 'rgb(0, 0, 0)',
+                                borderWidth: 2,
+                                label: {
+                                    content: 'China join WTO',
+                                    position: 'end', 
+                                    enabled: true,
+                                    yAdjust: -60, 
+                                }
+                            },
+                        '2-4': {
+                                type: 'line',
+                                xMin: filteredYears.indexOf(2020),  
+                                xMax: filteredYears.indexOf(2020),
+                                borderColor: 'rgb(0, 0, 0)',
+                                borderWidth: 2,
+                                label: {
+                                    content: 'COVID19',
+                                    position: 'end', 
+                                    enabled: true,
+                                    yAdjust: -20, 
+                                }
+                            },
+                            '2-5': {
+                                type: 'line',
+                                scaleID: 'y',
+                                borderColor: 'rgb(0, 0, 0)',
+                                borderWidth: 2,
+                                value: 785,
+                                label: {
+                                    content: 'Poverty line $785',
+                                    enabled: true,
+                                }
+                            }
+                        
+                    }
+                }
+            },
+            scales: {
+            y: {
+            stacked: true
+            }
+            }
+        }
+    });
+
+    const ctxGdpChange = document.getElementById('chart-gdp-change').getContext('2d');
+    chartGdpChange = new Chart(ctxGdpChange, {
+        type: 'line',
+        data: {
+            labels: filteredYears,
+            datasets: [{
+                label: 'GDP annual change (%)',
+                data: filteredGdpAnnualChange,
+                borderColor: 'rgba(153, 102, 255, 1)',
+                backgroundColor: 'rgba(153, 102, 255, 0.2)',
+            }]
+        },
+        options: {
+            responsive: true,
+            title: {
+                display: true,
+                text: 'GDP Annual Change Data'
+            },
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero: true
+                    }
+                }]
+            },
+            plugins: {
+                annotation: {
+                    annotations: {
+                        '3-1': {
+                            type: 'line',
+                            xMin: filteredYears.indexOf(1966),  
+                            xMax: filteredYears.indexOf(1966),
+                            borderColor: 'rgb(0, 0, 0)',
+                            borderWidth: 2,
+                            label: {
+                                content: 'Cultural Revolution',
+                                position: 'end', 
+                                enabled: true,
+                                yAdjust: -20, 
+                            }
+                        },
+                        '3-2': {
+                                type: 'line',
+                                xMin: filteredYears.indexOf(1978),  
+                                xMax: filteredYears.indexOf(1978),
+                                borderColor: 'rgb(0, 0, 0)',
+                                borderWidth: 2,
+                                label: {
+                                    content: 'Chinese Economic Reform',
+                                    position: 'end', 
+                                    enabled: true,
+                                    yAdjust: -60, 
+                                }
+                            },
+                        '3-3': {
+                                type: 'line',
+                                xMin: filteredYears.indexOf(2001),  
+                                xMax: filteredYears.indexOf(2001),
+                                borderColor: 'rgb(0, 0, 0)',
+                                borderWidth: 2,
+                                label: {
+                                    content: 'China join WTO',
+                                    position: 'end', 
+                                    enabled: true,
+                                    yAdjust: -60, 
+                                }
+                            },
+                        '3-4': {
+                                type: 'line',
+                                xMin: filteredYears.indexOf(2020),  
+                                xMax: filteredYears.indexOf(2020),
+                                borderColor: 'rgb(0, 0, 0)',
+                                borderWidth: 2,
+                                label: {
+                                    content: 'COVID19',
+                                    position: 'end', 
+                                    enabled: true,
+                                    yAdjust: -20, 
+                                }
+                            }
+                    }
+                }
+            }
+        }
+    });
+        const btnRevolution = document.getElementById('btn-revolution');
+        const btnReform = document.getElementById('btn-reform');
+        const btnWTO = document.getElementById('btn-wto');
+        const btnCovid = document.getElementById('btn-covid');
+
+        const eventDescription = document.getElementById('event-description');
+
+        btnRevolution.addEventListener('click', function() {
+            document.getElementById('start-year').value = 1961;
+            document.getElementById('end-year').value = 1977;
+            document.getElementById('start-year-display').innerText = "1961";
+            document.getElementById('end-year-display').innerText = "1977";
+            eventDescription.innerText = 'What happened:In 1966, Chairman Mao started the cultrual revolution, caused the regression of economic growth.';
+            updateCharts();
+        });
+
+        btnReform.addEventListener('click', function() {
+            document.getElementById('start-year').value = 1966;
+            document.getElementById('end-year').value = 2000;
+            document.getElementById('start-year-display').innerText = "1966";
+            document.getElementById('end-year-display').innerText = "2000";
+            eventDescription.innerText = 'What happened:In 1978, President Deng started the Chinese economic reform, fostering the growth of economy. In 1999, Chinese GDP per capita exceed the poverty line.';
+            updateCharts();
+        });
+
+        btnWTO.addEventListener('click', function() {
+            document.getElementById('start-year').value = 1978;
+            document.getElementById('end-year').value = 2019;
+            document.getElementById('start-year-display').innerText = "1978";
+            document.getElementById('end-year-display').innerText = "2019";
+            eventDescription.innerText = 'What happened:In 2001, China joined WTO(World Trade Organization), which promoted export and further fostering the economy growth.';
+            updateCharts();
+        });
+
+        btnCovid.addEventListener('click', function() {
+            document.getElementById('start-year').value = 2001;
+            document.getElementById('end-year').value = 2022;
+            document.getElementById('start-year-display').innerText = "2001";
+            document.getElementById('end-year-display').innerText = "2022";
+            eventDescription.innerText = 'What happened:The epidemic of COVID19 attacked the world, lots of companies went to bankruptcy and economy growth stopped, caused a 3.71% decrease of GDP growth.';
+            updateCharts();
+        });
+}
+
+updateCharts();
+</script>
+</body>
+</html>
