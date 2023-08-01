@@ -15,6 +15,12 @@
             text-align: center;
         }
 
+        #image-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
         .chart-container {
           width: 1300px;
           height: 700px;
@@ -27,6 +33,7 @@
           height: 100px;
           direction: rtl;
         }
+        
     </style>
 </head>
 <body>
@@ -38,6 +45,7 @@
         <button id="btn-covid">COVID19</button>
     </div>
     <p id="event-description"></p>
+    <div id="image-container"></div>
     <label for="start-year">Start Year: </label>
     <input type="range" id="start-year" name="start-year" min="1961" max="2022">
     <span id="start-year-display">1961</span>
@@ -374,7 +382,7 @@ function updateCharts() {
         const btnCovid = document.getElementById('btn-covid');
 
         const eventDescription = document.getElementById('event-description');
-
+        
         btnRevolution.addEventListener('click', function() {
             document.getElementById('start-year').value = 1961;
             document.getElementById('end-year').value = 1977;
@@ -382,6 +390,14 @@ function updateCharts() {
             document.getElementById('end-year-display').innerText = "1977";
             eventDescription.innerText = 'What happened:In 1966, Chairman Mao started the cultrual revolution, caused the regression of economic growth.';
             updateCharts();
+            const imageContainer = document.getElementById('image-container');
+            imageContainer.innerHTML = '';
+            const img = document.createElement('img');
+            img.src = 'image1.jpg';
+            img.width = 800;
+            img.alt = 'Image 1';
+            imageContainer.appendChild(img);
+
         });
 
         btnReform.addEventListener('click', function() {
@@ -391,6 +407,13 @@ function updateCharts() {
             document.getElementById('end-year-display').innerText = "2000";
             eventDescription.innerText = 'What happened:In 1978, President Deng started the Chinese economic reform, fostering the growth of economy. In 1999, Chinese GDP per capita exceed the poverty line.';
             updateCharts();
+            const imageContainer = document.getElementById('image-container');
+            imageContainer.innerHTML = '';
+            const img = document.createElement('img');
+            img.src = 'image2.jpg';
+            img.width = 800;
+            img.alt = 'Image 2';
+            imageContainer.appendChild(img);
         });
 
         btnWTO.addEventListener('click', function() {
@@ -400,6 +423,13 @@ function updateCharts() {
             document.getElementById('end-year-display').innerText = "2019";
             eventDescription.innerText = 'What happened:In 2001, China joined WTO(World Trade Organization), which promoted export and further fostering the economy growth.';
             updateCharts();
+            const imageContainer = document.getElementById('image-container');
+            imageContainer.innerHTML = '';
+            const img = document.createElement('img');
+            img.src = 'image3.jpg';
+            img.width = 800;
+            img.alt = 'Image 3';
+            imageContainer.appendChild(img);
         });
 
         btnCovid.addEventListener('click', function() {
@@ -409,6 +439,13 @@ function updateCharts() {
             document.getElementById('end-year-display').innerText = "2022";
             eventDescription.innerText = 'What happened:The epidemic of COVID19 attacked the world, lots of companies went to bankruptcy and economy growth stopped, caused a 3.71% decrease of GDP growth.';
             updateCharts();
+            const imageContainer = document.getElementById('image-container');
+            imageContainer.innerHTML = '';
+            const img = document.createElement('img');
+            img.src = 'image4.jpg';
+            img.width = 800;
+            img.alt = 'Image 4';
+            imageContainer.appendChild(img);
         });
 }
 
